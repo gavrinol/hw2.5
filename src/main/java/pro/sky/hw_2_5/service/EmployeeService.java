@@ -12,39 +12,45 @@ import java.util.*;
 public class EmployeeService {
 
     private static final int limit = 10;
-    private final List<Employee> employees = new ArrayList<>();
+    private final Map<String, Employee> employees = new HashMap<>();
 
-    public Employee add(String name, String surname) {
-        Employee employee = new Employee(name, surname);
-        if (employees.contains(employee)) {
-            throw new EmployeeAlreadyAddedException();
+    private String getKey(String name, String surname){
+        return name + " " + surname;
+    }
+
+    public Employee add(String name,
+                        String surname,
+                        int department,
+                        double salary) {
+        Employee employee = new Employee(name, surname, department, salary);
+        if (employees.containsKey(getKey(name, surname))) {
+            throw new EmployeeAlreadyAddedException(); 
         }
         if (employees.size() < limit) {
-            employees.add(employee);
+            employees.put(getKey(name, surname), employee);
             return employee;
         }
         throw new EmployeeStorageIsFullException();
     }
 
     public Employee remove(String name, String surname) {
-        Employee employee = new Employee(name, surname);
-        if (!employees.contains(employee)){
+        String key = getKey(name, surname);
+        if (!employees.containsKey(key)){
             throw new EmployeeNotFoundException();
         }
-        employees.remove(employee);
-        return employee;
+        return employees.remove(key);
     }
 
     public Employee find(String name, String surname) {
-        Employee employee = new Employee(name, surname);
-        if (!employees.contains(employee)){
+        String key = getKey(name, surname);
+        if (!employees.containsKey(getKey(name, surname))){
             throw new EmployeeNotFoundException();
         }
-        return employee;
+        return employees.get(key);
     }
 
     public List<Employee> getAll(){
-        return new ArrayList<>(employees);
+        return new ArrayList<>(employees.values());
     }
 
 }
